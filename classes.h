@@ -6,9 +6,8 @@ using namespace std;
 
 class Activity 
 {
+protected:
     string NameOfActivity;
-    int ActivityID;
-    static int Default;
     double Bill;
 
 public:
@@ -16,12 +15,12 @@ public:
     {
         NameOfActivity = nameOfActivity;
         Bill = bill;
+        cout << "Activity added." << endl;
     }
 
     Activity()
     {
         NameOfActivity = "Not Assigned";
-        ActivityID = 0;
         Bill = 0;
     }
 
@@ -38,7 +37,7 @@ public:
         cout << "Bill: " << Bill << endl;
     }
 
-    int validate(string Name)
+    int validateActivity(string Name)
     {
         if(NameOfActivity.compare(Name) == 0)
             return 1;
@@ -50,17 +49,16 @@ public:
 
 class Person : public Activity
 {
+protected:
     string name;
-    int ID;
-    static int Default;
     double spendings = 0;
+    vector<string> HistoryName;
     vector<double> History;
 
 public:
     Person()
     {
         name = "Not Assigned";
-        ID = 0;
         spendings = 0;
     }
 
@@ -68,22 +66,19 @@ public:
     {
         name = Name;
         cout << "Person Added!!!" << endl;
-        ID = Default;
-        Default++;
     }
 
-    void Editspendings(double SplitAmount)
+    void AddActivity(string ActivityName, double Bill)
     {
-        spendings += SplitAmount;
-        History.push_back(SplitAmount);
+        spendings += Bill;
+        HistoryName.push_back(ActivityName);
+        History.push_back(Bill);
     }
 
     void DisplayPerson()
     {
         cout << "Person: " << name << endl;
-        cout << "ID: " << ID << endl;
         cout << "Kharcha: " << spendings << endl;
-        
     }
 
     void ShowSpending()
@@ -91,11 +86,11 @@ public:
         cout << "\nExpenses: " << endl;
         for (int i = 0; i < History.size(); i++)
         {
-            cout << "Expense1 " << i + 1 << ": " << History[i] << endl;
+            cout << i + 1 << ". " << HistoryName[i] << ": " << History[i] << endl;
         }
     }
 
-    int validate(string Name)
+    int validatePerson(string Name)
     {
         if(name.compare(Name) == 0)
             return 1;
@@ -104,8 +99,6 @@ public:
     }
 
 };
-
-int Person::Default = 1;
 
 class Group : public Person
 {
@@ -122,6 +115,18 @@ public:
     Group(string GroupName)
     {
         groupName = GroupName;
+        cout << "Group Name Added." << endl;
+    }
+
+    void DisplayGroup()
+    {
+        cout << "Displaying Group Details. " << endl;
+        cout << "Group Name : " << groupName << endl;
+        cout << "Group Members : " << endl;
+        for(int i = 0; i < PersonNames.size(); i++)
+        {
+            cout << "Member " << i+1 << " : " << PersonNames[i] << endl;
+        }
     }
 
     void AddPerson(string Name)
@@ -132,7 +137,7 @@ public:
 
     double SplitAmount(double Bill)
     {
-        return Bill/ PersonNames.size();
+        return (Bill/ PersonNames.size());
     }
 
     vector <string> getPersonNames()
@@ -140,7 +145,7 @@ public:
         return PersonNames;
     }
 
-    int validate(string Name)
+    int validateGroup(string Name)
     {
         if(groupName.compare(Name) == 0)
             return 1;

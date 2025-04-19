@@ -6,104 +6,114 @@ using namespace std;
 
 int main()
 {
-    vector<Activity> Act;
+    vector<Activity> activity;
     vector<Person> person;
     vector<Group> group;
-
-    string Name;
-    string GroupName;
-    string ActivityName;
-    double Bill;
-    int IDChoice, Controller;
 
     int choice;
 
     do
     {
-        cout << "1. Add Person. " << endl;
-        cout << "2. Add Group." << endl;
-        cout << "3. Add Activity." << endl;
-        cout << "4. Display Person. " << endl;
-        cout << "5. Display Activity." << endl;
-        cout << "6. Calculate Total Spendings of a person. " << endl;
-        cout << "7. Exit." << endl;
+        cout << "\n|--------------------------------------------------|" << endl;
+        cout << "| 1. Add Person.                                   |" << endl;
+        cout << "| 2. Add Group.                                    |" << endl;
+        cout << "| 3. Add Activity.                                 |" << endl;
+        cout << "| 4. Display Person.                               |" << endl;
+        cout << "| 5. Display Group.                                |" << endl;
+        cout << "| 6. Display Activity.                             |" << endl;
+        cout << "| 7. Calculate Total Spendings of a person.        |" << endl;
+        cout << "| 8. Exit.                                         |" << endl;
+        cout << "|--------------------------------------------------|" << endl;
         cout << "Enter your choice: ";
         cin >> choice;
+        cin.ignore();
 
         switch (choice)
         {
         case 1:
         {
+            string Name;
+
             cout << "Enter the name of the Person: ";
-            cin.ignore();
             getline(cin, Name);
+
             person.push_back(Person(Name));
             break;
         }
 
         case 2:
         {
+            string Name;
+            string GroupName;
+            int Controller = 0;
+
             cout << "Enter Group Name: ";
-            getchar();
             getline(cin, GroupName);
 
             group.push_back(Group(GroupName));
 
             do
             {
-                cout << "Enter the name of the Person you want to add (OR Enter 0 to continue): ";
-                cin.ignore();
+                cout << "Enter the name of the Person you want to add (OR Enter \"Exit\" to continue): ";
                 getline(cin, Name);
 
                 for (int i = 0; i < person.size(); i++)
                 {
-                    Controller = person[i].validate(Name);
+                    Controller = person[i].validatePerson(Name);
 
                     if (Controller == 1)
                     {
-                        group[group.size()].AddPerson(Name);
+                        group[group.size() - 1].AddPerson(Name);
                         break;
                     }
                 }
 
-                if (Controller == 0)
+                if (Controller == 0 && Name != "Exit")
                 {
                     cout << "No Person found with such name." << endl;
                 }
-            } while (Name != "0");
+            } while (Name != "Exit");
             cout << "Group Created!" << endl;
             break;
         }
 
         case 3:
         {
-            cout << "\nEnter: 1. Add activity for a person.\n2. Add activity in a group." << endl;
-            cout << "Enter choice";
+            string Name;
+            string GroupName;
+            string ActivityName;
+            double Bill;
+            int IDChoice;
+            int Controller = 0;
+
+            cout << "\nEnter: \n1. Add activity for a person.\n2. Add activity in a group." << endl;
+            cout << "Enter choice: ";
             cin >> IDChoice;
+            cin.ignore();
 
             if (IDChoice == 1)
             {
                 cout << "Enter the name of the person: ";
-                cin.ignore();
                 getline(cin, Name);
-
-                cout << "Enter the name of the activity: ";
-                cin.ignore();
-                getline(cin, ActivityName);
-
-                cout << "Enter the bill: ";
-                cin >> Bill;
-
-                Act.push_back(Activity(ActivityName, Bill));
 
                 for (int i = 0; i < person.size(); i++)
                 {
 
-                    Controller = person[i].validate(Name);
+                    Controller = person[i].validatePerson(Name);
 
                     if (Controller == 1)
                     {
-                        person[i].Editspendings(Bill);
+                        cout << "Enter the name of the activity: ";
+                        getline(cin, ActivityName);
+
+                        cout << "Enter the bill: ";
+                        cin >> Bill;
+                        cin.ignore();
+
+                        activity.push_back(Activity(ActivityName, Bill));
+
+                        person[i].AddActivity(ActivityName, Bill);
+                        break;
                     }
                 }
 
@@ -115,17 +125,25 @@ int main()
             else if (IDChoice == 2)
             {
                 cout << "Enter group name: ";
-                cin.ignore();
                 getline(cin, GroupName);
 
                 int SplitAmount;
 
                 for (int i = 0; i < group.size(); i++)
                 {
-                    Controller = group[i].validate(GroupName);
+                    Controller = group[i].validateGroup(GroupName);
 
                     if (Controller == 1)
                     {
+                        cout << "Enter the name of the activity: ";
+                        getline(cin, ActivityName);
+
+                        cout << "Enter Bill: ";
+                        cin >> Bill;
+                        cin.ignore();
+
+                        activity.push_back(Activity(ActivityName, Bill));
+
                         SplitAmount = group[i].SplitAmount(Bill);
 
                         vector<string> Names = group[i].getPersonNames();
@@ -135,14 +153,13 @@ int main()
                             for (int j = 0; j < person.size(); j++)
                             {
 
-                                Controller = person[j].validate(Names[i]);
+                                Controller = person[j].validatePerson(Names[i]);
 
                                 if (Controller == 1)
                                 {
-                                    person[j].Editspendings(Bill);
+                                    person[j].AddActivity(ActivityName, SplitAmount);
                                     break;
                                 }
-
                             }
                         }
                     }
@@ -150,7 +167,7 @@ int main()
 
                 if (Controller == 0)
                 {
-                    cout << "No Person found with such name." << endl;
+                    cout << "No Group found with such name." << endl;
                 }
             }
             else
@@ -163,13 +180,16 @@ int main()
 
         case 4:
         {
+            string Name;
+            string ActivityName;
+            int Controller = 0;
+
             cout << "Enter the Person Name: ";
-            cin.ignore();
             getline(cin, Name);
 
             for (int i = 0; i < person.size(); i++)
             {
-                Controller = person[i].validate(Name);
+                Controller = person[i].validatePerson(Name);
 
                 if (Controller == 1)
                 {
@@ -186,17 +206,45 @@ int main()
         }
 
         case 5:
-            cout << "Enter the name of the Activity you want to display: ";
-            cin.ignore();
-            getline(cin, Name);
+        {
+            string GroupName;
+            int Controller = 0;
 
-            for (int i = 0; i < Act.size(); i++)
+            cout << "Enter the group name that you want to display: ";
+            getline(cin, GroupName);
+
+            for (int i = 0; i < group.size(); i++)
             {
-                Controller = person[i].validate(Name);
+                Controller = group[i].validateGroup(GroupName);
 
                 if (Controller == 1)
                 {
-                    Act[i].DisplayActivity();
+                    group[i].DisplayGroup();
+                    break;
+                }
+            }
+
+            if (Controller == 0)
+            {
+                cout << "No Group found with such name." << endl;
+            }
+            break;
+        }
+        case 6:
+        {
+            string Name;
+            int Controller = 0;
+
+            cout << "Enter the name of the Activity you want to display: ";
+            getline(cin, Name);
+
+            for (int i = 0; i < activity.size(); i++)
+            {
+                Controller = activity[i].validateActivity(Name);
+
+                if (Controller == 1)
+                {
+                    activity[i].DisplayActivity();
                     break;
                 }
             }
@@ -206,38 +254,42 @@ int main()
                 cout << "No Activity found with such name." << endl;
             }
             break;
-
-        case 6:
-            cout << "Enter the name of the Person: ";
-            cin.ignore();
-            getline(cin, Name);
-
-            for (int i = 0; i < person.size(); i++)
-            {
-                Controller = person[i].validate(Name);
-
-                if (Controller == 1)
-                {
-                    person[i].ShowSpending();
-                    break;
-                }
-            }
-
-            if (Controller == 0)
-            {
-                cout << "No Person found with such name." << endl;
-            }
-            break;
-
+        }
         case 7:
+        {
+            {
+                string Name;
+                int Controller = 0;
+
+                cout << "Enter the name of the Person: ";
+                getline(cin, Name);
+
+                for (int i = 0; i < person.size(); i++)
+                {
+                    Controller = person[i].validatePerson(Name);
+
+                    if (Controller == 1)
+                    {
+                        person[i].ShowSpending();
+                        break;
+                    }
+                }
+
+                if (Controller == 0)
+                {
+                    cout << "No Person found with such name." << endl;
+                }
+                break;
+            }
+        case 8:
             cout << "Exiting program." << endl;
             break;
 
         default:
             cout << "Invalid choice. Try again." << endl;
         }
-
-    } while (choice != 5);
+        }
+    } while (choice != 8);
 
     return 0;
 }
