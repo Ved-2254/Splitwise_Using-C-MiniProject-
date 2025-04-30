@@ -34,3 +34,10 @@ This is a C++ console application that helps users manage shared expenses betwee
 ---
 
 ## 🗂️ File Structure
+
+```text
+project-root/
+├── main.cpp         # Entry point: menu, I/O, control flow
+├── classes.h        # Declarations: User, Group, Activity classes
+├── picosha2.h       # SHA-256 hashing header (PicoSHA2)
+└── README.md        # This file
