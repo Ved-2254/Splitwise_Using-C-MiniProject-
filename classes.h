@@ -2,23 +2,30 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <unordered_map>            // Part of C++ Standard Library (STL) for efficient key-value storage using a hash table       
-#include "picosha2.h"               // For SHA-256 password hashing, downloaded from: https://github.com/okdshin/PicoSHA2
+#include "picosha2.h" // For SHA-256 password hashing, downloaded from: https://github.com/okdshin/PicoSHA2
 using namespace std;
 #pragma once
 
-class UserPassword
+class User
 {
 private:
     string username;
-    string password;
+    float spendings = 0;
+    vector<string> HistoryName;
+    vector<float> History;
+    vector<string> Friend;
 
 public:
-    UserPassword(string Username, string pass)
+    User()
+    {
+        username = "Not Assigned";
+    };
+
+    User(string Username, string pass)
     {
         ofstream file;
         username = Username;
-        password = hashPassword(pass);
+        string password = hashPassword(pass);
 
         file.open("UserData.txt", ios::app);
 
@@ -33,15 +40,22 @@ public:
         }
     }
 
-    string hashPassword(const string& password) {
+    User(string &Username)
+    {
+        username = Username;
+    }
+
+    string hashPassword(string &password)
+    {
         return picosha2::hash256_hex_string(password);
     }
 
-    static string hashPass(const string& password) {
+    static string hashPass(string &password)
+    {
         return picosha2::hash256_hex_string(password);
     }
 
-    static int ValidateUser(string Username)
+    static int ValidateUser(string &Username)
     {
         ifstream file;
 
@@ -75,7 +89,6 @@ public:
                 }
                 catch (const std::out_of_range &e)
                 {
-                    cout << "User not found";
                     file.close();
                     return 0;
                 }
@@ -83,7 +96,7 @@ public:
         }
     }
 
-    static int ValidatePassword(string Username, string Password)
+    static int ValidatePassword(string &Username, string &Password)
     {
         ifstream file;
 
@@ -122,7 +135,7 @@ public:
                         }
                     }
                 }
-                catch(const std::out_of_range& e)
+                catch (const std::out_of_range &e)
                 {
                     file.close();
                     return 2;
@@ -136,67 +149,42 @@ public:
             return 3;
         }
     }
-};
 
-class Activity
-{
-protected:
-    string NameOfActivity;
-    float Bill;
-
-public:
-    Activity(string nameOfActivity, float bill)
+    void AddFriend(string &Name, int &Cont)
     {
-        NameOfActivity = nameOfActivity;
-        Bill = bill;
-        cout << "Activity added." << endl;
+        int Controller = 0;
+        for (int i = 0; i < Friend.size(); i++)
+        {
+            if (Name == Friend[i])
+            {
+                Controller = 1;
+                Cont = 1;
+                break;
+            }
+        }
+        if (Controller == 0)
+        {
+            Friend.push_back(Name);
+        }
     }
 
-    Activity()
+    void DisplayFriends()
     {
-        NameOfActivity = "Not Assigned";
-        Bill = 0;
-    }
-
-    void DisplayActivity()
-    {
-        cout << "Activity: " << NameOfActivity << endl;
-        cout << "Bill: " << Bill << endl;
-    }
-
-    int validateActivity(string Name)
-    {
-        if (NameOfActivity.compare(Name) == 0)
-            return 1;
-        else
-            return 0;
-    }
-};
-
-class Person
-{
-protected:
-    string name;
-    float spendings = 0;
-    vector<string> HistoryName;
-    vector<float> History;
-
-public:
-    Person()
-    {
-        name = "Not Assigned";
-        spendings = 0;
-    }
-
-    Person(string Name)
-    {
-        name = Name;
-        cout << "Friend Added!!!" << endl;
+        cout << "Friends list: " << endl;
+        for(int i = 0; i < Friend.size(); i++)
+        {
+            cout << i+1 << ". " << Friend[i] << endl;
+        }
     }
 
     string getName()
     {
-        return name;
+        return username;
+    }
+
+    int getNoOfFriends()
+    {
+        return Friend.size();
     }
 
     void AddActivity(string ActivityName, float Bill)
@@ -208,25 +196,56 @@ public:
 
     void DisplayPerson()
     {
-        cout << "UserName: " << name << endl;
+        cout << "\n+===============================================+" << endl;
+        cout << "UserName: " << username << endl;
         cout << "Spendings: " << spendings << endl;
+        cout << "+===============================================+" << endl;
     }
 
     void ShowSpending()
     {
-        cout << "\nExpenses: " << endl;
+        cout << "\n+===============================================+" << endl;
+        cout << "Expenses: " << endl;
         for (int i = 0; i < History.size(); i++)
         {
             cout << i + 1 << ". " << HistoryName[i] << ": " << History[i] << endl;
         }
+        cout << "Total Spendings: " << spendings << endl;
+        cout << "+===============================================+" << endl;
     }
 
-    int validatePerson(string Name)
+    int validatePerson(string &Name)
     {
-        if (name.compare(Name) == 0)
+        if (username.compare(Name) == 0)
             return 1;
         else
             return 0;
+    }
+
+    int validateFriend(string &Name)
+    {
+        for (int i = 0; i < Friend.size(); i++)
+        {
+            if (Friend[i].compare(Name) == 0)
+                return 1;
+        }
+        return 0;
+    }
+
+    void DisplayActivity(string &ActivityName, int &Controller)
+    {
+        cout << "\n+===============================================+";
+        for (int i = 0; i < HistoryName.size(); i++)
+        {
+            if (HistoryName[i] == ActivityName)
+            {
+                cout << "\nActivity: " << HistoryName[i] << endl;
+                cout << "Bill: " << History[i] << endl;
+                Controller = 1;
+                continue;
+            }
+        }
+        cout << "+===============================================+" << endl;
     }
 };
 
@@ -245,7 +264,7 @@ public:
         groupName = "Not Assigned.";
     }
 
-    Group(string GroupName)
+    Group(string &GroupName)
     {
         groupName = GroupName;
         cout << "Group Name Added." << endl;
@@ -253,7 +272,8 @@ public:
 
     void DisplayGroup()
     {
-        cout << "\nDisplaying Group Details. " << endl;
+        cout << "\n+===============================================+" << endl;
+        cout << "Displaying Group Details. " << endl;
         cout << "Group Name : " << groupName << endl;
         cout << "Group Members : " << endl;
         for (int i = 0; i < PersonNames.size(); i++)
@@ -263,32 +283,31 @@ public:
         cout << "Total Spendings : " << Spending << endl;
 
         int choice;
-        cout << "Enter 1 to see detailed history: " << endl;
+        cout << "\nEnter 1 to see detailed history: ";
         cin >> choice;
 
-        if(choice == 1)
+        if (choice == 1)
         {
-            for(int i = 0; i < HistoryName.size(); i++)
+            for (int i = 0; i < HistoryName.size(); i++)
             {
                 cout << i + 1 << ". " << HistoryName[i] << ": " << History[i] << endl;
             }
         }
+        cout << "+===============================================+" << endl;
     }
 
-    void AddPerson(string Name)
+    void AddPerson(string &Name)
     {
         PersonNames.push_back(Name);
-        cout << "Member Added Successfully." << endl;
     }
 
-    float SplitAmount(float Bill)
+    float SplitAmount(float &Bill)
     {
         Spending += Bill;
         return (Bill / PersonNames.size());
-
     }
 
-    void AddActivity(string ActivityName, float Bill)
+    void AddActivity(string &ActivityName, float &Bill)
     {
         HistoryName.push_back(ActivityName);
         History.push_back(Bill);
@@ -299,7 +318,7 @@ public:
         return PersonNames;
     }
 
-    int validateGroup(string Name)
+    int validateGroup(string &Name)
     {
         if (groupName.compare(Name) == 0)
             return 1;

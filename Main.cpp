@@ -2,30 +2,37 @@
 #include <vector>
 #include <string>
 #include <fstream>
-#include <unordered_map>
 #include "classes.h"
 #include "picosha2.h" // For SHA-256 password hashing, downloaded from: https://github.com/okdshin/PicoSHA2
 using namespace std;
 
 int main()
 {
-    vector<UserPassword> userVerify;
-    vector<Person> person;
-    vector<Group> group;
-    vector<Activity> activity;
+    cout << "\n\n             _____       ___ __ _       ___         " << endl;
+    cout << "            / ___/____  / (_) /| |     / (_)_______ " << endl;
+    cout << "            \\__ \\/ __ \\/ / / __/ | /| / / / ___/ _ \\" << endl;
+    cout << "           ___/ / /_/ / / / /_ | |/ |/ / (__  )  __/" << endl;
+    cout << "          /____/ ____/_/_/\\__/ |__/|__/_/____/\\___/ " << endl;
+    cout << "              /_/                                   " << endl;
 
+    vector<User> userVerify;
+    vector<Group> group;
+
+    string Username;
     int choice1, choice2;
-    int controller2 = 0;
+    int Controller2 = 0;
     int userindex;
 
     do
     {
-        cout << "|-------------------|" << endl;
-        cout << "|Enter:             |" << endl;
-        cout << "|1. Login.          |" << endl;
-        cout << "|2. Signup.         |" << endl;
-        cout << "|3. Exit.           |" << endl;
-        cout << "|-------------------|" << endl;
+        cout << "\n\n+=====================+" << endl;
+        cout << "|       Welcome       |" << endl;
+        cout << "+=====================+" << endl;
+        cout << "| [1] Login.          |" << endl;
+        cout << "| [2] Signup.         |" << endl;
+        cout << "| [3] Exit.           |" << endl;
+        cout << "+---------------------+" << endl;
+        cout << "Enter your choice: ";
         cin >> choice1;
         cin.ignore();
         if (cin.fail())
@@ -35,96 +42,134 @@ int main()
             cout << "Enter an Integer. ";
         }
 
+        Controller2 = 0;
         choice2 = 0;
 
         switch (choice1)
         {
         case 1:
         {
-            string Username;
             string Password;
-
-            cout << "Enter your UserName: ";
-            getline(cin, Username);
-
-            cout << "Enter Password: ";
-            getline(cin, Password);
-
-            controller2 = UserPassword::ValidatePassword(Username, Password);
-
-            if (controller2 == 1)
-            {
-                person.push_back(Person(Username));
-                userindex = person.size() - 1;
-                cout << "Login Successful." << endl;
-            }
-            else if (controller2 == 0)
-            {
-                cout << "Invalid Password." << endl;
-            }
-            else if (controller2 == 2)
-            {
-                cout << "Invalid Username." << endl;
-            }
-            break;
-        }
-        break;
-
-        case 2:
-        {
-            string Username;
-            string Password1, Password2;
 
             do
             {
-                cout << "\nEnter your UserName: ";
+                cout << "\nEnter your UserName (Enter \"Return\" to go back): ";
                 getline(cin, Username);
 
-                cout << "Enter Password: ";
-                getline(cin, Password1);
-
-                cout << "Confirm  Password: ";
-                getline(cin, Password2);
-
-                if (Password1 == Password2)
+                if (Username != "Return")
                 {
-                    userVerify.push_back(UserPassword(Username, Password1));
-                    person.push_back(Person(Username));
-                    userindex = person.size() - 1;
-                    controller2 = 1;
+                    cout << "Enter Password: ";
+                    getline(cin, Password);
+
+                    Controller2 = User::ValidatePassword(Username, Password);
+
+                    if (Controller2 == 1)
+                    {
+                        userVerify.push_back(User(Username));
+                        for (int i = 0; i < userVerify.size(); i++)
+                        {
+                            if (Username == userVerify[i].getName())
+                            {
+                                userindex = i;
+                                break;
+                            }
+                        }
+                        cout << "LOGIN SUCCESSFULL!" << endl;
+                    }
+                    else if (Controller2 == 0)
+                    {
+                        cout << "INVALID PASSWORD!" << endl;
+                    }
+                    else if (Controller2 == 2)
+                    {
+                        cout << "INVALID USERNAME!" << endl;
+                    }
                     break;
                 }
-                else
+            } while (Username != "Return");
+            break;
+        }
+
+        case 2:
+        {
+            string Password1, Password2;
+            int Controller;
+
+            do
+            {
+                cout << "\nEnter your UserName(Enter \"Return\" to go back): ";
+                getline(cin, Username);
+
+                if (Username != "Return")
                 {
-                    cout << "Password don't match. " << endl;
+                    cout << "Enter Password: ";
+                    getline(cin, Password1);
+
+                    cout << "Confirm  Password: ";
+                    getline(cin, Password2);
+
+                    if (Password1.length() >= 8 && (Password1.length() <= 16))
+                    {
+                        if (Password1 == Password2)
+                        {
+                            Controller = User::ValidateUser(Username);
+
+                            if (Controller == 0)
+                            {
+                                userVerify.push_back(User(Username, Password1));
+                                cout << "SIGNED UP SUCCESSFULLY" << endl;
+                                for (int i = 0; i < userVerify.size(); i++)
+                                {
+                                    if (Username == userVerify[i].getName())
+                                    {
+                                        userindex = i;
+                                    }
+                                }
+                                Controller2 = 1;
+                                break;
+                            }
+                            else if (Controller == 1)
+                            {
+                                cout << "USERNAME ALREADY TAKEN!" << endl;
+                            }
+                        }
+                        else
+                        {
+                            cout << "PASSWORD DON'T MATCH!" << endl;
+                        }
+                    }
+                    else
+                    {
+                        cout << "Password must be between 8 and 16 characters!" << endl;
+                    }
                 }
-            } while (1);
+            } while (Username != "Return");
             break;
         }
 
         case 3:
         {
-            controller2 = 0;
-            cout << "Thank you for using our program. " << endl;
+            Controller2 = 0;
+            cout << "\n\n\n\n***** Thank you for using our application! *****" << endl;
             break;
         }
         default:
-            cout << "Invalid Choice!!!" << endl;
+            cout << "Invalid choice! Try again..." << endl;
         }
 
-        while (choice2 != 8 && controller2 == 1)
+        while (choice2 != 9 && Controller2 == 1)
         {
-            cout << "\n|--------------------------------------------------|" << endl;
-            cout << "| 1. Add Friend.                                   |" << endl;
-            cout << "| 2. Add Group.                                    |" << endl;
-            cout << "| 3. Add Activity.                                 |" << endl;
-            cout << "| 4. Display profile.                              |" << endl;
-            cout << "| 5. Display Groups.                               |" << endl;
-            cout << "| 6. Display Activity.                             |" << endl;
-            cout << "| 7. Show Spendings History.                       |" << endl;
-            cout << "| 8. Log out.                                      |" << endl;
-            cout << "|--------------------------------------------------|" << endl;
-            cout << "Enter your choice: ";
+            cout << "\n+================================================+" << endl;
+            cout << "|                   Dashboard                    |" << endl;
+            cout << "+===============================================+" << endl;
+            cout << "| [1] Add Friend        | [2] Create Group       |" << endl;
+            cout << "| [3] Add Activity      | [4] View Profile       |" << endl;
+            cout << "| [5] View Friends list | [6] My Groups          |" << endl;
+            cout << "| [7] Activity Details  | [8] Spending History   |" << endl;
+            cout << "|------------------------------------------------|" << endl;
+            cout << "|                  [9] LOGOUT                    |" << endl;
+            cout << "+------------------------------------------------+" << endl;
+            cout << "Enter your choice (1-8): ";
             cin >> choice2;
             cin.ignore();
 
@@ -132,7 +177,7 @@ int main()
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout << "Enter an Integer. ";
+                cout << "Enter an Integer, ";
             }
 
             switch (choice2)
@@ -140,21 +185,54 @@ int main()
             case 1:
             {
                 string Name;
-                cout << "Enter Friend's UserName: ";
+                cout << "\nEnter your Friend's UserName: ";
                 getline(cin, Name);
 
-                int controller1 = 0;
+                int Controller1 = 0;
+                int Cont;
+                int Controller3 = 0;
 
-                controller1 = UserPassword::ValidateUser(Name);
+                Controller1 = User::ValidateUser(Name);
 
-                if (controller1 == 1)
+                string user = userVerify[userindex].getName();
+                if (Name == user)
                 {
-                    person.push_back(Person(Name));
+                    cout << "You cannot add yourself as a Friend. " << endl;
+                    Controller1 = 2;
+                }
+
+                if (Controller1 == 1)
+                {
+                    userVerify[userindex].AddFriend(Name, Cont);
+                    for (int i = 0; i < userVerify.size(); i++)
+                    {
+                        if (Name == userVerify[i].getName())
+                        {
+                            Controller3 = 1;
+                            break;
+                        }
+                    }
+                    if (Controller3 == 0)
+                    {
+                        userVerify.push_back(User(Name));
+                    }
+                    for (int i = 0; i < userVerify.size(); i++)
+                    {
+                        if (Name == userVerify[i].getName())
+                        {
+                            userVerify[i].AddFriend(Username, Cont);
+                            if(Cont == 1)
+                            {
+                                cout << "IS ALREADY A FRIEND." << endl;
+                            }
+                        }
+                    }
+                    cout << "FRIEND ADDED! " << endl;
                     break;
                 }
                 else
                 {
-                    cout << "User Not Found";
+                    cout << "Username not found!" << endl;
                 }
                 break;
             }
@@ -164,38 +242,71 @@ int main()
                 string Name;
                 string GroupName;
                 int Controller = 0;
-
-                cout << "Enter Group Name: ";
-                getline(cin, GroupName);
-
-                group.push_back(Group(GroupName));
-
-                string user = person[userindex].getName();
-
-                group[group.size() - 1].AddPerson(user);
-
+                int Controller3 = 1;
                 do
-                {
-                    cout << "Enter the name of the Person you want to add (OR Enter \"Exit\" to continue): ";
-                    getline(cin, Name);
+                {                
+                    cout << "\nEnter Group Name(Enter \"Return\" to go back): ";
+                    getline(cin, GroupName);
 
-                    for (int i = 0; i < person.size(); i++)
+                    for (int i = 0; i < group.size(); i++)
                     {
-                        Controller = person[i].validatePerson(Name);
+                        vector<string> Names = group[i].getPersonNames();
+
+                        for (int j = 0; j < Names.size(); j++)
+                        {
+                            if (userVerify[userindex].getName() == Names[j])
+                            {
+                                cout << "Group already exists with same name. " << endl;
+                                Controller = 1;
+                                break;
+                            }
+                        }
+                    }
+                }while(Controller == 1);
+
+                if (GroupName != "Return" && Controller != 1)
+                {
+                    group.push_back(Group(GroupName));
+
+                    string user = userVerify[userindex].getName();
+
+                    group[group.size() - 1].AddPerson(user);
+
+                    cout << "\n";
+
+                    do
+                    {
+                        Controller = 0;
+
+                        cout << "Enter the name of the Person you want to add (OR Enter \"Exit\" to continue): ";
+                        getline(cin, Name);
+
+                        Controller = userVerify[userindex].validateFriend(Name);
+
+                        if (Name == user)
+                        {
+                            cout << "You are already in the Group. " << endl;
+                            Controller = 2;
+                        }
+
+                        if (Name == user)
+                        {
+                            Controller = 2;
+                        }
 
                         if (Controller == 1)
                         {
                             group[group.size() - 1].AddPerson(Name);
-                            break;
+                            cout << "Member Added Successfully." << endl;
                         }
-                    }
 
-                    if (Controller == 0 && Name != "Exit")
-                    {
-                        cout << "No Person found with such username." << endl;
-                    }
-                } while (Name != "Exit");
-                cout << "Group Created!" << endl;
+                        if (Controller == 0 && Name != "Exit" && Controller != 2)
+                        {
+                            cout << "No such friend exists." << endl;
+                        }
+                    } while (Name != "Exit");
+                    cout << "GROUP CREATED!" << endl;
+                }
                 break;
             }
 
@@ -206,9 +317,13 @@ int main()
                 string ActivityName;
                 float Bill;
                 int IDChoice;
-                int Controller = 0;
+                int Controller1 = 0;
+                int Controller2 = 0;
 
-                cout << "\nEnter: \n1. Add activity with a friend.\n2. Add activity in a group." << endl;
+                cout << "\n+---------------------------------+" << endl;
+                cout << "|1. Add activity with a friend.   |" << endl;
+                cout << "|2. Add activity in a group.      |" << endl;
+                cout << "+---------------------------------+" << endl;
                 cout << "Enter choice: ";
                 cin >> IDChoice;
                 cin.ignore();
@@ -216,55 +331,59 @@ int main()
                 {
                     cin.clear();
                     cin.ignore(1000, '\n');
-                    cout << "Enter an integer!! ";
+                    cout << "Enter an integer. ";
                 }
 
                 if (IDChoice == 1)
                 {
-                    cout << "Enter the UserName of the friend: ";
+                    cout << "\nEnter the UserName of your Friend: ";
                     getline(cin, Name);
 
-                    for (int i = 0; i < person.size(); i++)
+                    int NoOfFriends = userVerify[userindex].getNoOfFriends();
+                    Controller1 = userVerify[userindex].validateFriend(Name);
+
+                    if (Controller1 == 1)
                     {
-
-                        Controller = person[i].validatePerson(Name);
-
-                        if (Controller == 1)
+                        for (int i = 0; i < userVerify.size(); i++)
                         {
-                            cout << "Enter the name of the activity: ";
-                            getline(cin, ActivityName);
+                            Controller2 = userVerify[i].validatePerson(Name);
 
-                            cout << "Enter the bill: ";
-                            cin >> Bill;
-                            cin.ignore();
+                            if (Controller2 == 1)
+                            {
+                                cout << "Enter the name of the activity: ";
+                                getline(cin, ActivityName);
 
-                            activity.push_back(Activity(ActivityName, Bill));
+                                cout << "Enter the bill: ";
+                                cin >> Bill;
+                                cin.ignore();
 
-                            float splitAmount = Bill / 2;
+                                float splitAmount = Bill / 2;
 
-                            person[i].AddActivity(ActivityName, splitAmount);
-                            person[userindex].AddActivity(ActivityName, splitAmount);
-                            break;
+                                userVerify[i].AddActivity(ActivityName, splitAmount);
+                                userVerify[userindex].AddActivity(ActivityName, splitAmount);
+                                cout << "ACTIVITY ADDED!" << endl;
+                                break;
+                            }
                         }
                     }
 
-                    if (Controller == 0)
+                    if (Controller1 == 0)
                     {
-                        cout << "User not found." << endl;
+                        cout << "FRIEND NOT FOUND!" << endl;
                     }
                 }
                 else if (IDChoice == 2)
                 {
-                    cout << "Enter group name: ";
+                    cout << "\nEnter the Name of the Group: ";
                     getline(cin, GroupName);
 
-                    int SplitAmount;
+                    float SplitAmount;
 
                     for (int i = 0; i < group.size(); i++)
                     {
-                        Controller = group[i].validateGroup(GroupName);
+                        Controller1 = group[i].validateGroup(GroupName);
 
-                        if (Controller == 1)
+                        if (Controller1 == 1)
                         {
                             cout << "Enter the name of the activity: ";
                             getline(cin, ActivityName);
@@ -273,39 +392,40 @@ int main()
                             cin >> Bill;
                             cin.ignore();
 
-                            activity.push_back(Activity(ActivityName, Bill));
-
                             SplitAmount = group[i].SplitAmount(Bill);
 
                             vector<string> Names = group[i].getPersonNames();
 
                             group[i].AddActivity(ActivityName, Bill);
 
+                            int NoOfFriends = userVerify[userindex].getNoOfFriends();
+
+                            cout << "ACTIVITY ADDED!" << endl;
+
                             for (int j = 0; j < Names.size(); j++)
                             {
-                                for (int k = 0; k < person.size(); k++)
+                                for (int k = 0; k < userVerify.size(); k++)
                                 {
 
-                                    Controller = person[k].validatePerson(Names[j]);
+                                    Controller2 = userVerify[k].validatePerson(Names[j]);
 
-                                    if (Controller == 1)
+                                    if (Controller2 == 1)
                                     {
-                                        person[k].AddActivity(ActivityName, SplitAmount);
+                                        userVerify[k].AddActivity(ActivityName, SplitAmount);
                                         break;
                                     }
                                 }
                             }
                         }
-                    }
-
-                    if (Controller == 0)
-                    {
-                        cout << "No Group found with such name." << endl;
+                        else
+                        {
+                            cout << "NO GROUOP FOUND!" << endl;
+                        }
                     }
                 }
                 else
                 {
-                    cout << "Invalid Choice!!!";
+                    cout << "INVALID CHOICE!" << endl;
                 }
 
                 break;
@@ -315,25 +435,35 @@ int main()
             {
                 int Controller = 0;
 
-                string Name = person[userindex].getName();
+                cout << "\n";
 
-                for (int i = 0; i < person.size(); i++)
+                string Name = userVerify[userindex].getName();
+
+                int NoOfFriends = userVerify[userindex].getNoOfFriends();
+
+                Controller = userVerify[userindex].validatePerson(Name);
+
+                if (Controller == 1)
                 {
-                    Controller = person[i].validatePerson(Name);
-
-                    if (Controller == 1)
-                    {
-                        person[i].DisplayPerson();
-                        break;
-                    }
+                    userVerify[userindex].DisplayPerson();
+                    break;
                 }
 
                 break;
             }
+
             case 5:
+            {
+                userVerify[userindex].DisplayFriends();
+                break;
+            }
+
+            case 6:
             {
                 string GroupName;
                 int Controller = 0;
+
+                cout << "\n";
 
                 for (int i = 0; i < group.size(); i++)
                 {
@@ -341,39 +471,31 @@ int main()
 
                     for (int j = 0; j < Names.size(); j++)
                     {
-                        if (person[userindex].getName() == Names[j])
+                        if (userVerify[userindex].getName() == Names[j])
                         {
                             group[i].DisplayGroup();
                             Controller = 1;
                             break;
                         }
                     }
+                }
 
-                    if (Controller == 0)
-                    {
-                        cout << "You are not a member of any groups." << endl;
-                    }
+                if (Controller == 0)
+                {
+                    cout << "NO GROUPS ADDED YET!" << endl;
                 }
                 break;
             }
-            case 6:
+
+            case 7:
             {
-                string Name;
+                string ActivityName;
                 int Controller = 0;
 
-                cout << "Enter the name of the Activity you want to display: ";
-                getline(cin, Name);
+                cout << "\nEnter the name of the Activity: ";
+                getline(cin, ActivityName);
 
-                for (int i = 0; i < activity.size(); i++)
-                {
-                    Controller = activity[i].validateActivity(Name);
-
-                    if (Controller == 1)
-                    {
-                        activity[i].DisplayActivity();
-                        break;
-                    }
-                }
+                userVerify[userindex].DisplayActivity(ActivityName, Controller);
 
                 if (Controller == 0)
                 {
@@ -381,30 +503,33 @@ int main()
                 }
                 break;
             }
-            case 7:
+
+            case 8:
             {
                 int Controller = 0;
 
-                string Name = person[userindex].getName();
+                string Name = userVerify[userindex].getName();
 
-                for (int i = 0; i < person.size(); i++)
+                Controller = userVerify[userindex].validatePerson(Name);
+
+                if (Controller == 1)
                 {
-                    Controller = person[i].validatePerson(Name);
-
-                    if (Controller == 1)
-                    {
-                        person[i].ShowSpending();
-                        break;
-                    }
+                    userVerify[userindex].ShowSpending();
+                    break;
                 }
                 break;
             }
-            case 8:
-                cout << "Logged out successfully." << endl;
+
+            case 9:
+            {
+                cout << "              *****LOGGED OUT*****              " << endl;
                 break;
+            }
 
             default:
-                cout << "Invalid choice. Try again." << endl;
+            {
+                cout << "Invalid choice! Try again..." << endl;
+            }
             }
         }
     } while (choice1 != 3);
